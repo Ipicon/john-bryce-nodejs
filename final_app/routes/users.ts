@@ -12,6 +12,7 @@ router.get('/dashboard', async (req, res) => {
   const symbols = await prisma.users_symbols.findMany({
     where: { user_id: 1 }
   });
+
   res.render('dashboard', {
     symbols
   });
