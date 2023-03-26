@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Dashboard</title>
+</head>
+<body class="grid h-screen w-screen place-items-center">
+<div>
+    <form class="flex flex-row gap-8" method="post" action="/users/add-currency">
+        <div class="flex flex-col gap-2">
+            <label for="new_symbol" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Add new
+                Symbol</label>
+            <input type="text" id="new_symbol" name="symbol"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   placeholder="New Symbol" required>
+        </div>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-1/2 self-end">
+            +
+        </button>
+    </form>
+    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-8">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+            <th scope="col" class="px-6 py-3">
+                Symbol
+            </th>
+            <th scope="col" class="px-6 py-3">
+                Value
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <% symbols.forEach(item => { %>
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <%= item.symbol %>
+                </th>
+                <td class="px-6 py-4">
+                    1
+                </td>
+            </tr>
+        <% }) %>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
