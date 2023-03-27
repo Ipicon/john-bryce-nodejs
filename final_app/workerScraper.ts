@@ -27,14 +27,20 @@ const workerScraper = async () => {
     axios.get(`https://www.google.com/finance/quote/${symbol}-USD`)
   );
 
-  const responses = await Promise.all(sitePromise);
+  const responses = (await Promise.allSettled(sitePromise)).filter(
+    (pr) => pr.status === 'fulfilled'
+  );
 
   for (
     let responseIndex = 0;
     responseIndex < responses.length;
     responseIndex++
   ) {
-    const $ = cheerio.load(responses[responseIndex].data);
+    const newResponse = responses[responseIndex];
+
+    if (newResponse.status !== 'fulfilled') return;
+
+    const $ = cheerio.load(newResponse.value.data);
     const value = $("[jsname='LXPcOd'] [jsname='ip75Cb']")
       .text()
       .replace(',', '');
