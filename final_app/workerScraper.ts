@@ -10,12 +10,15 @@ const symbolSchema = new Schema({
 });
 
 const Symbol = mongoose.model('Symbol', symbolSchema);
-
-const workerScraper = async () => {
+const prisma = new PrismaClient();
+const init = async () => {
   await mongoose.connect('mongodb://127.0.0.1:27017/mymongo');
   console.log('connected to mongo');
 
-  const prisma = new PrismaClient();
+  void workerScraper();
+};
+
+const workerScraper = async () => {
   const symbols = await prisma.users_symbols.findMany({
     distinct: 'symbol'
   });
@@ -48,4 +51,5 @@ const workerScraper = async () => {
   }
 };
 
-setInterval(() => void workerScraper(), 1000 * 60 * 30);
+void init();
+setInterval(() => void workerScraper(), 1000 * 60);
