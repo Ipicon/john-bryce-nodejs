@@ -49,7 +49,8 @@ const workerScraper = async () => {
     const response = await newSymbol.save();
     console.log(`saving value for ${symbol}`, response);
   }
+
+  setTimeout(() => void workerScraper(), 1000 * 60);
 };
 
 void init();
-setInterval(() => void workerScraper(), 1000 * 60);
