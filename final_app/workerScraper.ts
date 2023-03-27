@@ -48,4 +48,4 @@ const workerScraper = async () => {
   }
 };
 
-void workerScraper();
+setInterval(() => void workerScraper(), 1000 * 60 * 30);
