@@ -2,6 +2,8 @@ import express from 'express';
 import { body, validationResult } from 'express-validator';
 import { prisma } from '../index';
 import { Symbol } from '../models/symbol.schema';
+import { isAuthenticated } from '../middlewares/isAuth';
+import { user } from '@prisma/client';
 
 const router = express.Router();
 
@@ -9,9 +11,10 @@ router.get('/welcome', (req, res) => {
   res.render('welcome');
 });
 
-router.get('/dashboard', async (req, res) => {
+router.get('/dashboard', isAuthenticated, async (req, res) => {
+  const currUser = req.user as user;
   const symbols = await prisma.users_symbols.findMany({
-    where: { user_id: 1 },
+    where: { user_id: currUser.id },
     distinct: ['symbol']
   });
 
@@ -28,12 +31,14 @@ router.get('/dashboard', async (req, res) => {
   ).filter((sym) => sym !== null);
 
   res.render('dashboard', {
-    symbols: symbolsWithValues
+    symbols: symbolsWithValues,
+    user: currUser
   });
 });
 
 router.post(
   '/add-currency',
+  isAuthenticated,
   body('symbol')
     .isString()
     .isAlphanumeric()
@@ -48,7 +53,7 @@ router.post(
 
     await prisma.users_symbols.create({
       data: {
-        user_id: 1,
+        user_id: (req.user as user).id,
         symbol: req.body.symbol
       }
     });
