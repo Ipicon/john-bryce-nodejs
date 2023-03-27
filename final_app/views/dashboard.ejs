@@ -39,13 +39,28 @@
                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     <%= item.symbol %>
                 </th>
-                <td class="px-6 py-4">
-                    1
+                <td class="px-6 py-4" id="<%= item.symbol %>-value">
+                    <%= item.value %>
                 </td>
             </tr>
         <% }) %>
         </tbody>
     </table>
 </div>
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+    const socket = io();
+
+    const onNewValue = ({symbol, value}) => {
+        try {
+            const td = document.getElementById(`${symbol}-value`);
+            td.innerText = value;
+            console.log(`new value for ${symbol}: ${value}`)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+    socket.on("new-value", onNewValue);
+</script>
 </body>
 </html>

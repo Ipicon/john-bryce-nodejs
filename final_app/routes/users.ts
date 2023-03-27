@@ -1,6 +1,7 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import { prisma } from '../index';
+import { Symbol } from '../models/symbol.schema';
 
 const router = express.Router();
 
@@ -10,11 +11,24 @@ router.get('/welcome', (req, res) => {
 
 router.get('/dashboard', async (req, res) => {
   const symbols = await prisma.users_symbols.findMany({
-    where: { user_id: 1 }
+    where: { user_id: 1 },
+    distinct: ['symbol']
   });
 
+  const symbolsWithValues = (
+    await Promise.all(
+      symbols.map(({ symbol }) => {
+        try {
+          return Symbol.findOne({ symbol }).sort({ scrapedAt: -1 });
+        } catch (e) {
+          return null;
+        }
+      })
+    )
+  ).filter((sym) => sym !== null);
+
   res.render('dashboard', {
-    symbols
+    symbols: symbolsWithValues
   });
 });
 
