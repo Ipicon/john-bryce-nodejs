@@ -13,7 +13,7 @@ passport.use(
     async function (
       accessToken: string,
       refreshToken: string,
-      profile: { id: string },
+      profile: { id: string; username: string },
       done: (
         err: null | Error,
         user?: false | user,
@@ -21,13 +21,20 @@ passport.use(
       ) => void
     ) {
       try {
-        const user = await prisma.user.findFirst({
+        let user = await prisma.user.findFirst({
           where: {
             id: Number(profile.id)
           }
         });
 
-        if (!user) return done(null, false, { mgs: 'User is not registered!' });
+        if (!user) {
+          user = await prisma.user.create({
+            data: {
+              id: Number(profile.id),
+              username: profile.username
+            }
+          });
+        }
 
         return done(null, user);
       } catch (err) {
@@ -36,5 +43,13 @@ passport.use(
     }
   )
 );
+
+passport.serializeUser(function (user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function (obj: { id: string }, done) {
+  done(null, obj);
+});
 
 export default passport;
