@@ -8,6 +8,7 @@ import { user } from '@prisma/client';
 const router = express.Router();
 
 router.get('/welcome', (req, res) => {
+  if (req.user) return res.redirect('/users/dashboard');
   res.render('welcome');
 });
 
