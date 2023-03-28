@@ -6,10 +6,12 @@ import {Symbol} from './models/symbol.schema';
 import {io, Socket} from 'socket.io-client';
 
 // please note that the types are reversed
-const socket: Socket = io('http://localhost:3000');
+const socket: Socket = io(process.env.SOCKET_URL ?? 'http://localhost:3000');
 const prisma = new PrismaClient();
 const init = async () => {
-  await mongoose.connect('mongodb://127.0.0.1:27017/mymongo');
+  await mongoose.connect(
+    process.env.MONGO_URL ?? 'mongodb://127.0.0.1:27017/mymongo'
+  );
   console.log('connected to mongo');
 
   void workerScraper();

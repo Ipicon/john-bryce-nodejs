@@ -3,6 +3,8 @@ version: '3.8'
 volumes:
   mysql_data:
     driver: local
+  mongodb:
+    driver: local
 
 services:
   mysql:
@@ -16,6 +18,60 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_TCP_PORT: 3306
     ports:
-    - 3306:3306
+      - "3306:3306"
     expose:
       - 3306
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    expose:
+      - 27017
+    environment:
+      - MONGO_INITDB_DATABASE=mymongo
+    volumes:
+      - mongodb:/data/db
+  worker:
+    depends_on:
+      mongo:
+        condition: service_started
+      mysql:
+        condition: service_healthy
+      app:
+        condition: service_started
+    build:
+      context: .
+      dockerfile: ./Dockerfile.scraper
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=mysql://root:password@mysql:3306/mydb
+      - MONGO_URL=mongodb://mongo:27017/mymongo
+      - SOCKET_URL=http://app:3000
+    stdin_open: true
+    tty: true
+  app:
+    depends_on:
+      mongo:
+        condition: service_started
+      mysql:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: ./Dockerfile.express
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+    environment:
+      - DATABASE_URL=mysql://root:password@mysql:3306/mydb
+      - GITHUB_ID=
+      - GITHUB_SECRET=
+      - MONGO_URL=mongodb://mongo:27017/mymongo
+    stdin_open: true
+    tty: true

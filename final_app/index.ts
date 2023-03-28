@@ -42,6 +42,8 @@ io.on('connection', (socket) => {
 server.listen(3000, async () => {
   console.log('Server is running');
 
-  await mongoose.connect('mongodb://127.0.0.1:27017/mymongo');
+  await mongoose.connect(
+    process.env.MONGO_URL ?? 'mongodb://127.0.0.1:27017/mymongo'
+  );
   console.log('connected to mongoose');
 });
